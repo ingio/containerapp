@@ -1,0 +1,38 @@
+kind: containerapp
+location: northeurope
+name: asp-app
+resourceGroup: rg-containerapp-neu
+type: Microsoft.Web/containerApps
+tags:
+    tagname: value
+properties:
+    kubeEnvironmentId: /subscriptions/bf69f0e9-5eed-42f8-b9db-fbd125c860ce/resourceGroups/rg-containerapp-neu/providers/Microsoft.Web/kubeEnvironments/neu-env
+    configuration:
+        activeRevisionsMode: Multiple
+        secrets:
+        - name: mysecret
+          value: thisismysecret
+        ingress:
+            external: True
+            allowInsecure: false
+            targetPort: 80
+            traffic:
+            - latestRevision: true
+              weight: 100
+            transport: Auto
+    template:
+        revisionSuffix: myrevision
+        containers:
+        - image: mcr.microsoft.com/dotnet/core/samples:aspnetapp
+          name: aspnetapp
+          env:
+          - name: HTTP_PORT
+            value: 80
+          - name: secret_name
+            secretRef: mysecret
+          resources:
+              cpu: 0.5
+              memory: 1Gi
+        scale:
+            minReplicas: 1
+            maxReplicas: 1
